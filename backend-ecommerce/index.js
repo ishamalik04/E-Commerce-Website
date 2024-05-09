@@ -24,7 +24,7 @@ const { isAuth, sanitizeUser, cookieExtractor } = require("./services/common");
 const path = require("path");
 
 // This is your Stripe CLI webhook secret for testing your endpoint locally.
-const endpointSecret = process.env.ENDPOINT_SECRET;
+const endpointSecret = process.env.ENDPOINT_SECRET; // create .env file and add endpoint secret
 
 server.post(
   "/webhook",
@@ -63,9 +63,11 @@ server.post(
 const opts = {};
 // opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
 opts.jwtFromRequest = cookieExtractor;
-opts.secretOrKey = process.env.JWT_SECRET_KEY;
+opts.secretOrKey = process.env.JWT_SECRET_KEY; // create .env file and add JWT_SECRET_KEY
 
 // Middlewares
+
+// It helps to find production project directory when project is build
 server.use(express.static(path.resolve(__dirname, "build")));
 server.use(cookieParser());
 server.use(
@@ -77,6 +79,7 @@ server.use(
 );
 server.use(passport.authenticate("session"));
 
+// It helps to understand server what token we are declaring in headers
 server.use(
   cors({
     exposedHeaders: ["X-Total-Count"],
@@ -174,6 +177,7 @@ passport.deserializeUser(function (user, cb) {
 // This is your test secret API key.
 const stripe = require("stripe")(process.env.STRIP_SERVER_SECRET_KEY);
 
+// Creating Stripe Checkout Session on home or "/" path
 server.post("/create-checkout-session", async (req, res) => {
   const { products, id } = req.body;
   console.log("products is==>", products);
@@ -201,8 +205,8 @@ server.post("/create-checkout-session", async (req, res) => {
     metadata: {
       id,
     },
-    success_url: `https://magdum-ecommerce-pritam-magdum.onrender.com/order-success/${id}`,
-    cancel_url: "https://magdum-ecommerce-pritam-magdum.onrender.com/",
+    success_url: `https://magdum-ecommerce-pritam-magdum.onrender.com/order-success/${id}`, // Success URL
+    cancel_url: "https://magdum-ecommerce-pritam-magdum.onrender.com/", // Cancel URL
   });
 
   res.json({ id: session.id });
@@ -211,7 +215,7 @@ server.post("/create-checkout-session", async (req, res) => {
 main().catch((err) => console.log(err));
 
 async function main() {
-  await mongoose.connect(process.env.MONGODB_URL);
+  await mongoose.connect(process.env.MONGODB_URL); // Create .env file and add MONGODB_URL to connect and store the Project related data
   console.log("MongoDB Database Connected");
 }
 
